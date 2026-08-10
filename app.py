@@ -193,6 +193,15 @@ def init_db_data():
 
 
 # ===== API 路由 =====
+
+# API：健康檢查
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "ok",
+        "message": "API is running"
+    }), 200
+
 # API：取得所有景點
 @app.route("/api/attractions", methods=["GET"])
 def get_attractions():
