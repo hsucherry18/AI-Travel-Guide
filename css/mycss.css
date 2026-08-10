@@ -1,0 +1,306 @@
+:root {
+    /* Vintage Artsy 復古文藝質感 */
+    --bg-color: #F5F0E8;
+    --primary-color: #6D3B47;
+    --secondary-color: #D8C7A1;
+    --cbg-color: #FFFDF8;
+    --heading-color: #4A2C2A;
+    --text-color: #5A4A42;
+    --button-color: #8B5E3C;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: "LXGW WenKai TC", "Noto Serif TC", serif;
+}
+
+/* =========================
+   外框
+========================= */
+.wrapper {
+    width: 1024px;
+    margin: 10px auto 0 auto;
+}
+
+/* =========================
+   Hero 區（紙張質感）
+========================= */
+.imgbox {
+    width: 1024px;
+    height: 250px;
+
+    background-image:
+        linear-gradient(rgba(245,240,232,.75), rgba(245,240,232,.75)),
+        url("../image/travel.avif");
+
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    border-radius: 10px;
+    border: 2px solid var(--secondary-color);
+
+    box-shadow: 0 5px 15px rgba(0,0,0,.12);
+}
+
+/* =========================
+   導覽列
+========================= */
+nav {
+    background-color: var(--primary-color);
+    text-align: center;
+    padding: 20px 0;
+    margin: 15px 0 25px;
+    border-radius: 8px;
+}
+
+nav ul {
+    display: inline-block;
+}
+
+nav ul li {
+    float: left;
+    list-style: none;
+}
+
+nav ul li a {
+    display: block;
+
+    text-decoration: none;
+
+    background-color: var(--secondary-color);
+
+    color: var(--heading-color);
+
+    margin-right: 20px;
+
+    padding: 12px 22px;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    border: 1px solid rgba(0,0,0,.08);
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+
+    transition: .3s;
+}
+
+nav ul li:last-child a {
+    margin-right: 0;
+}
+
+nav ul li a:hover {
+    background-color: #EFE4CF;
+    color: var(--primary-color);
+    border-radius: 10px;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,.18);
+}
+
+/* =========================
+   內容區
+========================= */
+.content {
+    background-color: var(--cbg-color);
+
+    padding: 35px 40px 50px;
+
+    border-radius: 10px;
+
+    border: 1px solid var(--secondary-color);
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+
+    text-align: left;
+}
+
+/* 主標題 */
+.content h1 {
+    text-align: center;
+
+    color: var(--primary-color);
+
+    font-size: 42px;
+
+    letter-spacing: 3px;
+
+    margin: 10px 0 35px;
+}
+
+/* 區塊標題 */
+.content h2 {
+    color: var(--heading-color);
+
+    font-size: 24px;
+
+    margin: 35px 0 18px;
+
+    border-left: 6px solid var(--primary-color);
+
+    padding-left: 15px;
+}
+
+/* 內容文字 */
+.content p {
+    background-color: #FCFAF6;
+
+    border: 1px solid #E8DDD0;
+
+    color: var(--text-color);
+
+    font-size: 16px;
+
+    line-height: 1.9;
+
+    padding: 18px;
+
+    margin-bottom: 20px;
+
+    border-radius: 8px;
+}
+
+.content p strong {
+    display: block;
+
+    color: var(--primary-color);
+
+    font-size: 18px;
+
+    margin-bottom: 8px;
+}
+
+/* =========================
+   按鈕
+========================= */
+.content a {
+    display: block;
+
+    width: 160px;
+
+    height: 50px;
+
+    margin: 35px auto 0;
+
+    background-color: var(--button-color);
+
+    color: white;
+
+    text-decoration: none;
+
+    text-align: center;
+
+    line-height: 50px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    border-radius: 30px;
+
+    box-shadow: 0 4px 12px rgba(109,59,71,.28);
+
+    transition: .3s;
+}
+
+.content a:hover {
+    background-color: var(--primary-color);
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 18px rgba(109,59,71,.35);
+}
+
+/* =========================
+   Footer
+========================= */
+.footer {
+    background-color: var(--primary-color);
+
+    text-align: center;
+
+    padding: 18px 0;
+
+    margin-top: 20px;
+
+    border-radius: 8px;
+}
+
+.footer p {
+    color: #F5F0E8;
+
+    font-size: 14px;
+}
+
+/* =========================
+   RWD：1200px 以下
+========================= */
+@media screen and (max-width:1200px) and (min-width:1025px){
+
+    .wrapper{
+        width:95%;
+    }
+
+    .imgbox{
+        width:100%;
+    }
+
+}
+
+/* =========================
+   RWD：1024px 以下
+========================= */
+@media screen and (max-width:1024px){
+
+    .wrapper{
+        width:100%;
+        padding:10px;
+    }
+
+    .imgbox{
+        width:100%;
+        height:160px;
+    }
+
+    nav ul{
+        display:flex;
+        flex-direction:column;
+        width:100%;
+        padding:0;
+    }
+
+    nav ul li{
+        float:none;
+        width:100%;
+        margin-bottom:10px;
+    }
+
+    nav ul li a{
+        margin-right:0;
+        text-align:center;
+    }
+
+    .content{
+        padding:25px 18px;
+    }
+
+    .content h1{
+        font-size:32px;
+        letter-spacing:2px;
+    }
+
+    .content h2{
+        font-size:22px;
+    }
+
+    .content p{
+        line-height:1.8;
+    }
+}

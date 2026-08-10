@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 旅遊推薦平台</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
+
+    <style>
+        :root {
+            --main-blue: #2a6f97;
+            --dark-blue: #013a63;
+            --light-blue: #90e0ef;
+            --soft-blue: #cfe2ff;
+            --bg-blue: #f8fbff;
+            --bg-light-blue: #eef7ff;
+        }
+
+        /* ================= 基本 ================= */
+        body {
+            margin: 0;
+            background: #f4f6f8;
+            font-family: "Noto Sans TC", sans-serif;
+            color: #333;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+
+            box-shadow: 0 0 20px rgba(0, 0, 0, .08);
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .footer {
+            background: var(--dark-blue);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* ================= 導覽列 ================= */
+        .banner {
+
+            background: linear-gradient(90deg,
+                    var(--main-blue),
+                    var(--dark-blue));
+
+            padding: 15px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .banner h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .banner .nav {
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .banner .nav-link {
+            color: white;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: .3s;
+            white-space: nowrap;
+        }
+
+        .banner .nav-link:hover {
+            background: rgba(255, 255, 255, .15);
+            color: white;
+        }
+
+        .btn-text-primary {
+            color: var(--light-blue);
+        }
+
+        /* ================= 文字 ================= */
+        .title-blue {
+            color: var(--dark-blue);
+        }
+
+        .text-main {
+            color: var(--main-blue);
+        }
+
+        .text-dark-blue {
+            color: var(--dark-blue);
+        }
+
+        /* ================= 按鈕 ================= */
+        .btn-main {
+            background: var(--main-blue);
+            color: white;
+            border: none;
+        }
+
+        .btn-main:hover {
+            background: var(--dark-blue);
+            color: white;
+        }
+
+        .btn-outline-main {
+            color: var(--main-blue);
+            border: 1px solid var(--main-blue);
+        }
+
+        .btn-outline-main:hover {
+            background: var(--main-blue);
+            color: white;
+        }
+
+        /* ================= Badge ================= */
+        .badge-main {
+            background: var(--soft-blue);
+            color: var(--main-blue);
+        }
+
+        /* ================= 首頁 Hero ================= */
+        .hero-box {
+            min-height: 550px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            background-image: url("/image/travel.avif");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-box::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+        }
+
+        .hero-content .title-blue {
+            color: white;
+        }
+
+        .hero-text {
+            color: white;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .hero-box .row {
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ================= Hero 卡片 ================= */
+        .hero-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .25);
+        }
+
+        .hero-count {
+            color: var(--dark-blue);
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* ================= 一般卡片 ================= */
+        .card {
+            transition: .3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
+        }
+
+        .stat-card {
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+        }
+
+        /* ================= 圖片 ================= */
+        img {
+            object-fit: cover;
+        }
+
+        /* ================= Chart ================= */
+        .chart-box {
+            width: 100%;
+            height: 300px;
+        }
+
+        .chart-box canvas {
+            max-height: 300px;
+        }
+
+        /* ================= 景點列表 ================= */
+        .spot-title {
+            color: var(--dark-blue);
+            font-weight: bold;
+        }
+
+        .spot-info {
+            color: #666;
+            font-size: .9rem;
+        }
+
+        /* ================= 表單按鈕 ================= */
+        .save-btn {
+            background: linear-gradient(135deg,
+                    #2a6f97,
+                    #013a63);
+
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: .3s;
+        }
+
+
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .cancel-btn {
+            background: #f1f3f5;
+            color: #555;
+            border: 1px solid #ddd;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-weight: bold;
+        }
+
+        .cancel-btn:hover {
+            background: #e9ecef;
+        }
+
+        /* ================= 管理按鈕 ================= */
+        .edit-btn {
+            background: #90e0ef;
+            color: #013a63;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .edit-btn:hover {
+            background: #2a6f97;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #e76f51;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .delete-btn:hover {
+            background: #c44536;
+        }
+
+        /* ================= RWD ================= */
+        @media(max-width:768px) {
+
+            .banner {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .hero-content {
+                padding: 30px;
+            }
+
+            .hero-count {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <div class="wrapper">
+            <!-- ================= Banner ================= -->
+            <div class="banner">
+                <h1 class="display-4">
+                    AI 旅遊推薦平台
+                </h1>
+                <nav>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" @click.prevent="currentView='home'">
+                                <i class="fa-solid fa-house btn-text-primary"></i>
+                                首頁
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" @click.prevent="currentView='list'">
+                                <i class="fa-solid fa-location-dot btn-text-primary"></i>
+                                景點列表
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" @click.prevent="currentView='ai'">
+                                <i class="fa-solid fa-robot btn-text-primary"></i>
+                                AI推薦
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" @click.prevent="currentView='stats'">
+                                <i class="fa-solid fa-chart-pie btn-text-primary"></i>
+                                統計看板
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" @click.prevent="currentView='admin'">
+                                <i class="fa-solid fa-gear btn-text-primary"></i>
+                                景點管理
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" @click.prevent="currentView='contact'">
+                                <i class="fa-solid fa-envelope btn-text-primary"></i>
+                                聯絡我們
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- ================= Content ================= -->
+            <div class="content">
+                <!-- ================= 首頁 Home ================= -->
+                <div v-if="currentView=='home'" class="vstack gap-5">
+                    <!-- Hero 區 -->
+                    <div class="hero-box p-5 rounded-4 shadow">
+                        <div class="row align-items-center">
+
+                            <!-- 左側 -->
+                            <div class="col-lg-8 hero-content">
+                                <span class="badge rounded-pill px-3 py-2 btn-main">
+                                    ✨ 探索台灣之美
+                                </span>
+
+                                <h2 class="display-5 fw-bold mt-3 title-blue">
+                                    AI 輔助旅遊推薦平台
+                                </h2>
+
+                                <p class="hero-text mt-3">
+                                    結合台灣觀光景點資料，
+                                    搭配 AI 智慧行程規劃，
+                                    幫助您快速找到適合自己的旅遊路線。
+                                </p>
+
+                                <div class="mt-4 d-flex flex-wrap gap-3">
+                                    <button class="btn btn-main px-4" @click="currentView='ai'">
+                                        <i class="fa-solid fa-robot me-2"></i>
+                                        體驗 AI 規劃
+                                    </button>
+
+                                    <button class="btn btn-outline-light px-4" @click="currentView='list'">
+                                        <i class="fa-solid fa-map me-2"></i>
+                                        瀏覽景點列表
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 右側 -->
+                            <div class="col-lg-4 mt-4 mt-lg-0">
+                                <div class="hero-card text-center">
+                                    <i class="fa-solid fa-compass fa-4x hero-count mb-3"></i>
+                                    <p class="mb-1 text-secondary">
+                                        目前收錄景點
+                                    </p>
+                                    <h1 class="hero-count">
+                                        {{ spots.length }}
+                                    </h1>
+                                    <span class="text-secondary">
+                                        筆
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ================= 快速功能 ================= -->
+                    <div v-if="currentView=='home'">
+                        <h3 class="fw-bold mb-4 title-blue">
+                            🚀 快速探索核心功能
+                        </h3>
+                        <div class="row g-4 mt-2">
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm rounded-4" style="cursor:pointer;"
+                                    @click="currentView='list'">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fa-solid fa-map-location-dot fs-1 text-main">
+                                            </i>
+                                        </div>
+                                        <h4 class="fw-bold">
+                                            全台景點列表
+                                        </h4>
+                                        <p class="text-secondary">
+                                            透過縣市與鄉鎮市區搜尋，
+                                            找到想去的旅遊景點。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm rounded-4" style="cursor:pointer;"
+                                    @click="currentView='ai'">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fa-solid fa-robot fs-1 text-primary">
+                                            </i>
+                                        </div>
+                                        <h4 class="fw-bold">
+                                            AI智慧行程規劃
+                                        </h4>
+                                        <p class="text-secondary">
+                                            輸入目的地與旅遊天數，
+                                            讓 AI 幫您安排旅程。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm rounded-4" style="cursor:pointer;"
+                                    @click="currentView='stats'">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fa-solid fa-chart-pie fs-1 text-warning">
+                                            </i>
+                                        </div>
+                                        <h4 class="fw-bold">
+                                            資料統計看板
+                                        </h4>
+                                        <p class="text-secondary">
+                                            查看景點分類、
+                                            縣市分布與資料分析。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ================= 熱門城市 ================= -->
+                    <div v-if="currentView=='home'">
+                        <h3 class="fw-bold mt-5 mb-4 title-blue">
+                            🏙️ 熱門旅遊城市快選
+                        </h3>
+                        <div class="row g-3 mt-2">
+                            <div class="col-6 col-md-3">
+                                <div class="card text-center p-3 shadow-sm" style="cursor:pointer;"
+                                    @click="selectCityAndGoList('臺北市')">
+                                    🏛️ 臺北市
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="card text-center p-3 shadow-sm" style="cursor:pointer;"
+                                    @click="selectCityAndGoList('臺中市')">
+                                    🌳 臺中市
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="card text-center p-3 shadow-sm" style="cursor:pointer;"
+                                    @click="selectCityAndGoList('高雄市')">
+                                    ⚓ 高雄市
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="card text-center p-3 shadow-sm" style="cursor:pointer;"
+                                    @click="selectCityAndGoList('花蓮縣')">
+                                    🌊 花蓮縣
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ================= 熱門景點搶先看 ================= -->
+                    <!-- ================= 精選景點 ================= -->
+                    <div v-if="currentView=='home'">
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <h3 class="fw-bold mb-0 title-blue">
+                                🔥 熱門精選景點
+                            </h3>
+                            <button class="btn btn-link text-decoration-none text-main" @click="currentView='list'">
+                                查看全部 →
+                            </button>
+                        </div>
+                        <div class="row g-4 mt-2">
+                            <div class="col-md-4" v-for="item in spots.slice(0,3)" :key="item.id">
+                                <div class="card h-100 rounded-4 shadow-sm overflow-hidden">
+                                    <!-- 圖片 -->
+                                    <div style="height:200px;" class="bg-light">
+                                        <img v-if="item.image" :src="item.image" class="w-100 h-100">
+                                        <div v-else
+                                            class="h-100 d-flex justify-content-center align-items-center text-secondary">
+                                            <i class="fa-regular fa-image fs-1"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <span class="badge rounded-pill badge-main">
+                                            {{item.category}}
+                                        </span>
+                                        <h5 class="fw-bold mt-3">
+                                            {{item.name}}
+                                        </h5>
+                                        <p class="small text-secondary">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            {{item.city}}
+                                        </p>
+                                        <p class="text-secondary small">
+                                            {{shortDescription(item.description)}}
+                                        </p>
+                                        <button class="btn btn-sm btn-main" @click="viewDetail(item)">
+                                            詳細內容
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ================= Home 結束 ================= -->
+                <!-- ================= 景點列表 List ================= -->
+                <div v-if="currentView=='list'" class="vstack gap-4">
+                    <h2 class="fw-bold title-blue">
+                        📍 景點列表與探索
+                    </h2>
+                    <!-- ================= 搜尋區 ================= -->
+                    <div class="p-4 rounded-4 bg-light">
+                        <div class="row g-3">
+                            <!-- 關鍵字 -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">
+                                    景點名稱搜尋
+                                </label>
+                                <input type="text" class="form-control" placeholder="輸入景點名稱" v-model="keyword"
+                                    @input="currentPage=1">
+                            </div>
+                            <!-- 縣市 -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">
+                                    選擇縣市
+                                </label>
+                                <select class="form-select" v-model="selectedCity" @change="getAreaList">
+                                    <option value="">
+                                        全部縣市
+                                    </option>
+                                    <option v-for="item in cityList" :value="item">
+                                        {{item}}
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- 鄉鎮區 -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">
+                                    選擇鄉鎮市區
+                                </label>
+                                <select class="form-select" v-model="selectedArea" @change="currentPage=1">
+                                    <option value="">
+                                        全部鄉鎮區
+                                    </option>
+                                    <option v-for="item in areaListData" :value="item">
+                                        {{item}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+
+                                <label class="form-label fw-bold small">
+                                    排序方式
+                                </label>
+
+                                <select class="form-select" v-model="sortType">
+
+                                    <option value="">
+                                        預設排序
+                                    </option>
+
+                                    <option value="name">
+                                        依景點名稱
+                                    </option>
+
+                                    <option value="city">
+                                        依城市
+                                    </option>
+
+                                    <option value="category">
+                                        依分類
+                                    </option>
+
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ================= 搜尋結果 ================= -->
+                    <div class="alert alert-success">
+                        搜尋地區：
+                        <span class="fw-bold">
+                            {{selectedCity}}
+                            {{selectedArea}}
+                        </span>
+                        共找到
+                        <span class="fw-bold text-danger">
+                            {{filteredSpots.length}}
+                        </span>
+                        筆景點資料
+                    </div>
+                    <!-- 無資料 -->
+                    <div v-if="filteredSpots.length==0" class="alert alert-warning">
+                        查無景點資料
+                    </div>
+                    <!-- ================= 分頁 ================= -->
+                    <nav v-if="totalPage>1">
+                        <ul class="pagination justify-content-center">
+                            <!-- 上一頁 -->
+                            <li class="page-item">
+                                <a href="#" class="page-link" @click.prevent="changePage(currentPage-1)"
+                                    :class="{disabled:currentPage==1}">
+                                    上一頁
+                                </a>
+                            </li>
+                            <!-- 頁碼 -->
+                            <li class="page-item" v-for="page in totalPage" :key="page">
+                                <a href="#" class="page-link" @click.prevent="changePage(page)"
+                                    :class="{active:currentPage==page}">
+                                    {{page}}
+                                </a>
+                            </li>
+                            <!-- 下一頁 -->
+                            <li class="page-item">
+                                <a href="#" class="page-link" @click.prevent="changePage(currentPage+1)"
+                                    :class="{disabled:currentPage==totalPage}">
+                                    下一頁
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <!-- ================= 景點卡片 ================= -->
+                    <div class="row g-4">
+                        <div class="col-md-4" v-for="item in pageSpots" :key="item.id">
+                            <div class="card h-100 rounded-4 shadow-sm overflow-hidden">
+                                <!-- 圖片 -->
+                                <img :src="item.image" class="card-img-top" style="height:220px;" alt="景點圖片">
+                                <div class="card-body">
+                                    <span class="badge badge-main">
+                                        {{item.category}}
+                                    </span>
+                                    <h5 class="card-title fw-bold mt-3">
+                                        {{item.name}}
+                                    </h5>
+                                    <p class="small text-secondary">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        {{item.city}}
+                                        {{item.town}}
+                                    </p>
+                                    <p class="small text-secondary">
+                                        <i class="fa-solid fa-phone"></i>
+                                        {{item.phone || '暫無電話'}}
+                                    </p>
+                                    <p class="text-secondary small">
+                                        {{shortDescription(item.description)}}
+                                    </p>
+
+                                    <button class="btn btn-sm text-white w-100 btn-main" @click="viewDetail(item)">
+                                        查看詳細內容
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ================= 景點列表結束 ================= -->
+                <!-- ================= AI推薦 ================= -->
+                <div v-if="currentView=='ai'" class="vstack gap-4">
+                    <h2 class="fw-bold title-blue">
+                        🤖 AI 智慧旅遊行程規劃
+                    </h2>
+                    <p class="text-secondary">
+                        輸入旅遊需求，讓 AI 幫您規劃專屬行程。
+                    </p>
+                    <div class="p-4 bg-light rounded-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    目的地
+                                </label>
+                                <input type="text" class="form-control" v-model="aiForm.destination"
+                                    placeholder="例如：臺中市">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    旅遊天數
+                                </label>
+                                <input type="number" class="form-control" v-model.number="aiForm.days">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    喜好主題
+                                </label>
+                                <input type="text" class="form-control" v-model="aiForm.preference"
+                                    placeholder="美食、自然、人文">
+                            </div>
+                        </div>
+                        <button class="btn text-white mt-4 btn-main" @click="generateAI">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            產生 AI 行程
+                        </button>
+                    </div>
+                    <!-- AI結果 -->
+                    <div v-if="aiResult" class="card shadow-sm rounded-4">
+                        <div class="card-body">
+                            <h4 class="fw-bold text-main">
+                                ✨ AI 建議行程
+                            </h4>
+                            <hr>
+                            <p>
+                                目的地：
+                                {{aiResult.destination}}
+                            </p>
+                            <p>
+                                天數：
+                                {{aiResult.days}} 天
+                            </p>
+                            <div v-for="day in aiResult.itinerary" class="mb-4">
+
+                                <h4 class="fw-bold text-main">
+                                    {{day.day}}
+                                </h4>
+                                <div v-for="activity in day.activities" class="card mb-3 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="fw-bold">
+                                            🕒 {{activity.time}}
+                                        </h5>
+                                        <h5 class="text-primary">
+                                            📍 {{activity.location}}
+                                        </h5>
+                                        <p>
+                                            <strong>景點介紹：</strong>
+                                            {{activity.description}}
+                                        </p>
+                                        <p>
+                                            <strong>🚗 交通：</strong>
+                                            {{activity.transportation}}
+                                        </p>
+                                        <p>
+                                            <strong>🍴 美食：</strong>
+                                            {{activity.food}}
+                                        </p>
+                                        <p>
+                                            <strong>💡 小提醒：</strong>
+                                            {{activity.tip}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 景點詳細頁 ================= -->
+                <div v-if="currentView=='detail'" class="vstack gap-4">
+                    <h2 class="fw-bold title-blue">
+                        📌 景點詳細內容
+                    </h2>
+                    <div v-if="activeSpot" class="card shadow-sm rounded-4 overflow-hidden">
+                        <!-- 圖片 -->
+                        <img v-if="activeSpot.image" :src="activeSpot.image" class="w-100" style="height:350px;">
+                        <div class="card-body p-4">
+                            <!-- 分類 -->
+                            <span class="badge mb-3 badge-main">
+                                {{activeSpot.category}}
+                            </span>
+                            <!-- 名稱 -->
+                            <h2 class="fw-bold">
+                                {{activeSpot.name}}
+                            </h2>
+                            <!-- 基本資料 -->
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <p>
+                                        <i class="fa-solid fa-location-dot icon-main"></i>
+                                        <strong>
+                                            地址：
+                                        </strong>
+                                        {{activeSpot.address}}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>
+                                        <i class="fa-solid fa-phone icon-main"></i>
+                                        <strong>
+                                            電話：
+                                        </strong>
+                                        {{activeSpot.phone || '未提供'}}
+                                    </p>
+                                </div>
+                            </div>
+                            <hr>
+                            <h5 class="fw-bold">
+                                景點介紹
+                            </h5>
+                            <p class="text-secondary lh-lg">
+                                {{activeSpot.description}}
+                            </p>
+                            <button class="btn text-white btn-main" @click="currentView='list'">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                返回列表
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- ================= 統計看板 ================= -->
+                <div v-if="currentView=='stats'" class="vstack gap-4">
+                    <!-- ================= 統計看板 ================= -->
+                    <div class="row g-4">
+                        <!-- 分類統計 -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm p-4 h-100">
+                                <h5 class="fw-bold mb-3">
+                                    景點分類統計
+                                </h5>
+                                <div class="chart-box">
+                                    <div style="height:300px; padding-top:30px;">
+                                        <canvas id="categoryChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 縣市統計 -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm p-4 h-100">
+                                <h5 class="fw-bold mb-3">
+                                    縣市分布統計
+                                </h5>
+                                <div class="chart-box">
+                                    <canvas id="cityChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="fw-bold title-blue">
+                        📊 資料統計看板
+                    </h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm p-4">
+                                <h5>景點總數</h5>
+                                <h2>
+                                    {{statistics.total}}
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm p-4">
+                                <h5>城市數量</h5>
+                                <h2>
+                                    {{cityCount}}
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm p-4">
+                                <h5>分類數量</h5>
+                                <h2>
+                                    {{categoryCount}}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ================= 景點管理 ================= -->
+
+                <div v-if="currentView=='admin'" class="vstack gap-2">
+                    <!-- 標題 + 新增按鈕 -->
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="fw-bold title-blue mb-0">
+                            ⚙️ 景點管理
+                        </h2>
+                        <button type="button" class="btn btn-main" @click="openCreate">
+                            <i class="fa-solid fa-plus me-2"></i>
+                            新增景點
+                        </button>
+                    </div>
+                    <!-- 新增景點表單 -->
+                    <div v-if="showForm && !editMode" class="card shadow-sm p-4 mt-2">
+                        <h4 class="fw-bold title-blue">
+                            新增景點
+                        </h4>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                景點名稱
+                            </label>
+                            <input class="form-control" placeholder="例如：阿里山森林公園" v-model="formSpot.name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                城市
+                            </label>
+                            <input class="form-control" v-model="formSpot.city" placeholder="例如：嘉義市">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                分類
+                            </label>
+                            <input class="form-control" v-model="formSpot.category" placeholder="例如：自然景點">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                圖片網址
+                            </label>
+                            <input class="form-control" v-model="formSpot.image" placeholder="https://example.com/photo.jpg">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                景點介紹
+                            </label>
+                            <textarea class="form-control" rows="5" v-model="formSpot.description" placeholder="輸入景點相關介紹">
+
+            </textarea>
+                        </div>
+                        <div class="d-flex gap-3 mt-3">
+                            <button type="button" class="save-btn" @click="saveSpot">
+                                <i class="fa-solid fa-check me-2"></i>
+                                新增
+                            </button>
+                            <button class="cancel-btn" @click="showForm=false">
+                                <i class="fa-solid fa-xmark me-2"></i>
+                                取消
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 景點列表 -->
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        名稱
+                                    </th>
+                                    <th>
+                                        城市
+                                    </th>
+                                    <th>
+                                        操作
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template v-for="item in spots" :key="item.id">
+                                    <!-- 景點資料 -->
+                                    <tr>
+                                        <td>
+                                            {{item.name}}
+                                        </td>
+                                        <td>
+                                            {{item.city}}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-end">
+                                                <button type="button" class="edit-btn" @click="editSpot(item)">
+                                                    修改
+                                                </button>
+                                                <button type="button" class="delete-btn" @click="deleteSpot(item.id)">
+                                                    刪除
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- 修改表單出現在該筆下面 -->
+
+                                    <tr v-if="showForm && editMode && formSpot.id === item.id">
+                                        <td colspan="3">
+                                            <div class="card shadow-sm p-4">
+                                                <h4 class="fw-bold title-blue">
+                                                    修改景點
+                                                </h4>
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        景點名稱
+                                                    </label>
+                                                    <input class="form-control" v-model="formSpot.name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        城市
+                                                    </label>
+                                                    <input class="form-control" v-model="formSpot.city">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        分類
+                                                    </label>
+                                                    <input class="form-control" v-model="formSpot.category">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        圖片網址
+                                                    </label>
+                                                    <input class="form-control" v-model="formSpot.image">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">
+                                                        景點介紹
+                                                    </label>
+                                                    <textarea class="form-control" rows="5"
+                                                        v-model="formSpot.description">
+
+                                </textarea>
+                                                </div>
+                                                <div class="d-flex gap-3 mt-3">
+                                                    <button type="button" class="save-btn" @click="saveSpot">
+                                                        <i class="fa-solid fa-check me-2"></i>
+                                                        儲存修改
+                                                    </button>
+                                                    <button type="button" class="cancel-btn" @click="showForm=false">
+                                                        <i class="fa-solid fa-xmark me-2"></i>
+                                                        取消
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- ================= 聯絡我們 ================= -->
+                <div v-if="currentView=='contact'" class="vstack gap-4">
+                    <h2 class="fw-bold title-blue">
+                        ✉️ 聯絡我們
+                    </h2>
+                    <div class="card shadow-sm p-4">
+                        <p class="lh-lg">
+                            如果您對 AI 旅遊推薦平台有任何建議，
+                            歡迎與我們聯絡。
+                        </p>
+                        <p>
+                            <i class="fa-solid fa-envelope"></i>
+                            Email：
+                            support@travel-ai.com.tw
+                        </p>
+                        <p>
+                            <i class="fa-solid fa-phone"></i>
+                            客服電話：
+                            0800-123-456
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- content結束 -->
+        <!-- ================= Footer ================= -->
+        <div class="footer">
+            <p class="mb-0">
+                Power By AI 旅遊推薦平台 © 2026
+            </p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        const App = {
+            data() {
+                return {
+                    //目前頁面
+                    currentView: "home",
+                    //景點資料
+                    spots: [],
+                    chartReady: false,
+                    categoryChart: null,
+                    cityChart: null,
+                    //統計資料
+                    statistics: {
+                        total: 0,
+                        categoryStats: [],
+                        cityStats: []
+                    },
+                    activeSpot: null,
+                    //搜尋
+                    keyword: "",
+                    //縣市資料
+                    cityData: [],
+                    areaListData: [],
+                    selectedCity: "",
+                    selectedArea: "",
+                    // 排序
+                    sortType: "",
+                    //分頁
+                    pageSize: 6,
+                    currentPage: 1,
+                    //AI
+                    aiForm: {
+                        destination: "臺北市",
+                        days: 2,
+                        preference: "美食"
+                    },
+                    aiResult: null,
+                    //管理
+                    showForm: false,
+                    editMode: false,
+                    formSpot: {
+                        id: null,
+                        name: "",
+                        city: "",
+                        category: "",
+                        image: "",
+                        description: ""
+                    },
+                    successMessage: "",
+                }
+            },
+            methods: {
+                //========================
+                //取得景點資料
+                //========================
+                getSpotData() {
+                    const vm = this;
+                    axios.get("http://127.0.0.1:5000/api/attractions")
+                        .then(function (res) {
+                            console.log(res.data);
+                            vm.spots = res.data.attractions;
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        });
+                },
+                //========================
+                //取得統計資料
+                //========================
+                getStatistics() {
+                    axios.get("http://127.0.0.1:5000/api/dashboard/statistics")
+                        .then(res => {
+                            this.statistics = res.data.statistics;
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                },
+                //========================
+                //取得縣市資料
+                //========================
+                getCityData() {
+                    const vm = this;
+                    axios.get("http://127.0.0.1:5000/api/attractions")
+                        .then(function (res) {
+                            vm.cityData = res.data.attractions;
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        });
+                },
+                //========================
+                //縣市改變取得鄉鎮
+                //========================
+                getAreaList() {
+
+                    let area = [];
+
+                    this.spots.forEach(item => {
+                        if (item.city.includes(this.selectedCity)) {
+                            if (item.town && !area.includes(item.town)) {
+                                area.push(item.town);
+                            }
+                        }
+                    });
+                    this.areaListData = area;
+                },
+                //========================
+                //篩選景點
+                //========================
+                filteredSpotsData() {
+                    this.currentPage = 1;
+                },
+                //========================
+                //頁碼
+                //========================
+                changePage(page) {
+                    if (page < 1) {
+                        return;
+                    }
+                    if (page > this.totalPage) {
+                        return;
+                    }
+                    this.currentPage = page;
+                },
+
+                //========================
+                //查看詳細
+                //========================
+
+
+                viewDetail(item) {
+                    this.activeSpot = item;
+                    this.currentView = "detail";
+                },
+
+                //========================
+                //熱門城市
+                //========================
+                selectCityAndGoList(city) {
+                    this.selectedCity = city;
+                    this.currentView = "list";
+                    this.getAreaList();
+                },
+                //========================
+                //AI推薦
+                //========================
+                generateAI() {
+                    const vm = this;
+                    axios.post(
+                        "http://127.0.0.1:5000/api/ai/recommend",
+                        vm.aiForm
+                    )
+                        .then(function (res) {
+                            console.log("AI回傳資料：", res.data);
+                            vm.aiResult = res.data;
+                            // 如果 AI 回傳簡易文字格式，轉換成前端格式
+                            if (
+                                Array.isArray(vm.aiResult.itinerary) &&
+                                typeof vm.aiResult.itinerary[0] === "string"
+                            ) {
+                                vm.aiResult.itinerary =
+                                    vm.aiResult.itinerary.map((text, index) => {
+                                        return {
+                                            day: `第 ${index + 1} 天`,
+                                            activities: [
+                                                {
+                                                    time: "全天",
+                                                    location: "推薦景點",
+                                                    description: text,
+                                                    transportation: "依照導航安排交通",
+                                                    food: vm.aiResult.preference,
+                                                    tip: vm.aiResult.tip
+                                                }
+                                            ]
+                                        }
+                                    });
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        });
+                },
+
+                //========================
+                //新增
+                //========================
+                openCreate() {
+                    this.editMode = false;
+                    this.formSpot = {
+                        id: null,
+                        name: "",
+                        city: "",
+                        category: "",
+                        image: "",
+                        description: "",
+                        phone: "",
+                        address: ""
+                    };
+                    this.showForm = true;
+                },
+                //修改
+                editSpot(item) {
+                    this.editMode = true;
+                    this.formSpot = { ...item };
+                    this.showForm = true;
+                },
+                //儲存
+                //儲存
+                saveSpot() {
+                    const vm = this;
+                    // 欄位檢查
+                    if (
+                        !this.formSpot.name.trim() ||
+                        !this.formSpot.city.trim() ||
+                        !this.formSpot.category.trim() ||
+                        !this.formSpot.image.trim() ||
+                        !this.formSpot.description.trim()
+                    ) {
+                        alert(
+                            "請完整填寫景點資料"
+                        );
+
+                        return;
+                    }
+                    // 修改
+                    if (vm.editMode) {
+                        axios.put(
+                            "http://127.0.0.1:5000/api/attractions/" + vm.formSpot.id,
+                            vm.formSpot
+                        )
+                            .then(function () {
+                                vm.getSpotData();
+                                vm.showForm = false;
+                                vm.currentView = "admin";
+                                alert("修改成功！");
+                            })
+                            .catch(function (err) {
+                                console.log(err);
+                                alert("修改失敗");
+                            });
+                    }
+                    // 新增
+                    else {
+                        axios.post(
+                            "http://127.0.0.1:5000/api/attractions",
+                            vm.formSpot
+                        )
+                            .then(function () {
+                                alert("新增景點成功！");
+                                vm.currentView = "admin";
+                                vm.getSpotData();
+                                vm.showForm = false;
+                            })
+                            .catch(function (err) {
+                                console.log(err);
+                                alert("新增失敗");
+                            });
+                    }
+                },
+                //刪除
+                deleteSpot(id) {
+                    const vm = this;
+                    if (!confirm("確定刪除嗎？")) {
+                        return;
+                    }
+                    axios.delete(
+                        "http://127.0.0.1:5000/api/attractions/" + id
+                    )
+                        .then(function () {
+                            alert("刪除成功！");
+                            vm.getSpotData();
+                            vm.currentView = "admin";
+                            console.log("刪除後:", vm.currentView);
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                            alert("刪除失敗");
+                        });
+                },
+                drawCharts() {
+                    let categoryCanvas = document.getElementById("categoryChart");
+                    let cityCanvas = document.getElementById("cityChart");
+
+                    //確認 canvas 存在
+                    if (!categoryCanvas || !cityCanvas) {
+                        return;
+                    }
+                    new Chart(categoryCanvas, {
+                        type: "bar",
+                        data: {
+                            labels: this.statistics.categoryStats.map(
+                                x => x.category
+                            ),
+                            datasets: [{
+                                label: "景點數",
+                                data: this.statistics.categoryStats.map(
+                                    x => x.count
+                                ),
+                                backgroundColor: "#2a6f97"
+                            }]
+                        }
+                    });
+                    new Chart(cityCanvas, {
+                        type: "pie",
+                        data: {
+                            labels: this.statistics.cityStats.map(
+                                x => x.city
+                            ),
+                            datasets: [{
+                                data: this.statistics.cityStats.map(
+                                    x => x.count
+                                ),
+                                backgroundColor: [
+                                    "#2a6f97",
+                                    "#ffb703",
+                                    "#fb8500",
+                                    "#8ecae6",
+                                    "#219ebc",
+                                    "#023047",
+                                    "#e63946",
+                                    "#8338ec"
+                                ]
+                            }]
+                        }
+                    });
+                }
+            },
+            computed: {
+                //篩選後資料
+                filteredSpots() {
+
+                    let result = this.spots.filter(item => {
+
+                        let keywordOK =
+                            !this.keyword ||
+                            item.name.includes(this.keyword);
+
+                        let cityOK =
+                            !this.selectedCity ||
+                            item.city.includes(this.selectedCity);
+
+                        let areaOK =
+                            !this.selectedArea ||
+                            item.town?.includes(this.selectedArea);
+
+                        return keywordOK
+                            && cityOK
+                            && areaOK;
+                    });
+                    // 排序
+                    if (this.sortType) {
+
+                        result.sort((a, b) => {
+                            return (a[this.sortType] || "")
+                                .localeCompare(
+                                    b[this.sortType] || "",
+                                    "zh-Hant"
+                                );
+                        });
+                    }
+                    return result;
+                },
+                //總頁數
+                totalPage() {
+                    return Math.ceil(
+                        this.filteredSpots.length /
+                        this.pageSize
+                    );
+                },
+                //目前頁資料
+                pageSpots() {
+                    let start =
+                        (this.currentPage - 1)
+                        *
+                        this.pageSize;
+                    return this.filteredSpots.slice(
+                        start,
+                        start + this.pageSize
+                    );
+                },
+                //城市數
+                cityCount() {
+                    let arr = [];
+                    this.spots.forEach(item => {
+                        let city = item.city.substring(0, 3);
+                        if (!arr.includes(city))
+                            arr.push(city);
+                    });
+                    return arr.length;
+                },
+                //分類數
+                categoryCount() {
+                    let arr = [];
+                    this.spots.forEach(function (item) {
+                        let c = item.category;
+                        if (!arr.includes(c)) {
+                            arr.push(c);
+                        }
+                    });
+                    return arr.length;
+                },
+                //首頁熱門城市
+                hotCities() {
+                    return [
+                        {
+                            name: "臺北市",
+                            icon: "🏛️"
+                        },
+                        {
+                            name: "臺中市",
+                            icon: "🌳"
+                        },
+                        {
+                            name: "高雄市",
+                            icon: "⚓"
+                        },
+                        {
+                            name: "花蓮縣",
+                            icon: "🌊"
+                        }
+                    ];
+                }, cityList() {
+                    let result = [];
+
+                    this.spots.forEach(function (item) {
+                        let city = item.city.substring(0, 3);;
+                        if (!result.includes(city)) {
+                            result.push(city);
+                        }
+                    });
+                    return result;
+                },
+                shortDescription() {
+                    return function (text) {
+                        if (!text) {
+                            return "";
+                        }
+                        if (text.length > 50) {
+                            return text.substring(0, 50) + "...";
+                        }
+                        return text;
+                    }
+                },
+            },
+            watch: {
+                currentView(value) {
+                    if (value == "stats") {
+                        this.$nextTick(() => {
+                            this.drawCharts();
+                        });
+                    }
+                }
+            },
+            mounted() {
+                console.log("mounted");
+
+                this.getSpotData();
+                this.getCityData();
+                this.getStatistics();
+            }
+        }
+        Vue.createApp(App).mount("#app");
+    </script>
+</body>
+
+</html>
